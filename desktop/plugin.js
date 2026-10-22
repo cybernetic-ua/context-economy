@@ -362,7 +362,7 @@ function PriceNote({ t }) {
             borderTop: '1px solid ' + C.stroke, padding: '12px 16px',
             fontSize: 12.5, lineHeight: 1.55, color: C.soft
           },
-          children: ['price.source', 'price.cost', 'price.cache', 'price.missing'].map((key, i) =>
+          children: ['Prices source', 'Cost model', 'Cache savings formula', 'Unknown cache price'].map((key, i) =>
             jsx('p', { style: { margin: i === 3 ? 0 : '0 0 8px' }, children: t(key) }, key)
           )
         })
