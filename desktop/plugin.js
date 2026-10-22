@@ -284,7 +284,12 @@ function Rows({ head, rows, empty, maxHeight, resetKey }) {
     }),
     jsx('div', {
       key: resetKey || 'rows',
-      style: { maxHeight: maxHeight || 340, overflowY: 'auto' },
+      style: {
+        maxHeight: maxHeight || 340, overflowY: 'auto',
+        // Scroll anchoring would keep the old position when the poll rebuilds
+        // rows, leaving the first row sliced in half.
+        overflowAnchor: 'none'
+      },
       children: rows.length
         ? rows.map((cells, ri) =>
             jsxs('div', {
@@ -541,7 +546,7 @@ function Body({ dense, t }) {
       ]),
       empty: t('No sessions'),
       maxHeight: dense ? 190 : 320,
-      resetKey: range
+      resetKey: range + ':' + shown.length + ':' + (shown[0] ? shown[0].id : '')
     }),
     jsx('div', { style: { ...S.hint, display: 'flex', justifyContent: 'space-between' }, children: [
       jsx('span', {
