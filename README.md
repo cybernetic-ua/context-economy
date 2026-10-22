@@ -20,8 +20,13 @@ The compact pane, docked right — every number below is a live read of `state.d
 
 ![Context Economy pane](docs/img/pane.png)
 
+Sessions are sortable by any column and newest-first by default; large counts are
+abbreviated with the exact figure on hover:
+
+![Sessions table and pricing note](docs/img/table-prices.png)
+
 The full page carries the same blocks plus a folded-per-day chart and the pricing
-breakdown.
+breakdown shown above.
 
 ## Install
 
