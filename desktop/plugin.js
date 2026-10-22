@@ -560,8 +560,15 @@ function Body({ dense, t }) {
     !sb.calls ? jsx('div', { style: { ...S.hint, marginTop: 8 }, children: t('Sandbox unused') }) : null
   ]})
 
+  // Backends older than 0.2.1 do not ship `ts`; fall back to the formatted label
+  // so the Started column still sorts instead of comparing zeros.
+  const startedKey = s => {
+    if (s.ts) return s.ts
+    const m = /^(\d{2})\.(\d{2}) (\d{2}):(\d{2})$/.exec(String(s.started || ''))
+    return m ? (((+m[2] * 31 + +m[1]) * 24 + +m[3]) * 60 + +m[4]) : 0
+  }
   const sortValue = (s, col) => {
-    if (col === 0) return s.ts || 0
+    if (col === 0) return startedKey(s)
     if (col === 1) return shortModel(s.model).toLowerCase()
     if (col === 2) return s.input || 0
     if (col === 3) return s.output || 0
