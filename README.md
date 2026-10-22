@@ -16,7 +16,12 @@ network calls.
 
 ## Screenshots
 
-_Pending — added with the first catalog release._
+The compact pane, docked right — every number below is a live read of `state.db`:
+
+![Context Economy pane](docs/img/pane.png)
+
+The full page carries the same blocks plus a folded-per-day chart and the pricing
+breakdown.
 
 ## Install
 
