@@ -376,16 +376,27 @@ function Body({ dense, t }) {
     children: [
       jsx('div', {
         'aria-live': 'polite',
-        style: { fontSize: 11.5, color: C.faint, ...S.num },
+        style: {
+          fontSize: 11.5, color: C.faint, ...S.num,
+          // Reserved width: "updating…" is shorter than "updated 21:04:05", so
+          // without this the control cluster jumps left/right on every poll.
+          minWidth: dense ? 96 : 116, flex: '0 0 auto',
+          whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
+        },
         children: isFetching ? t('Status updating') : t('Status updated', stamp)
       }),
-      jsx(Segmented, {
-        items: REFRESH_PRESETS.map(p => ({ key: String(p.seconds), label: p.label, value: p.seconds, minWidth: 38 })),
-        value: refreshSec, onChange: pickRefresh, ariaLabel: t('Refresh interval')
-      }),
-      jsx(Segmented, {
-        items: RANGES.map(r => ({ key: r, label: r, value: r, minWidth: 44 })),
-        value: range, onChange: setRange, ariaLabel: t('Period')
+      jsxs('div', {
+        style: { display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto', flex: '0 0 auto' },
+        children: [
+          jsx(Segmented, {
+            items: REFRESH_PRESETS.map(p => ({ key: String(p.seconds), label: p.label, value: p.seconds, minWidth: 38 })),
+            value: refreshSec, onChange: pickRefresh, ariaLabel: t('Refresh interval')
+          }),
+          jsx(Segmented, {
+            items: RANGES.map(r => ({ key: r, label: r, value: r, minWidth: 44 })),
+            value: range, onChange: setRange, ariaLabel: t('Period')
+          })
+        ]
       })
     ]
   })
