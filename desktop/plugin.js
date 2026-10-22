@@ -274,7 +274,7 @@ function Spark({ days }) {
 
 const COLS = '96px minmax(0,1fr) 54px 74px 58px'
 
-function Rows({ head, rows, empty, maxHeight }) {
+function Rows({ head, rows, empty, maxHeight, resetKey }) {
   return jsxs('div', { style: { ...S.card, overflow: 'hidden' }, children: [
     jsx('div', {
       style: { display: 'grid', gridTemplateColumns: COLS, gap: 10, ...S.th, alignItems: 'center' },
@@ -283,6 +283,7 @@ function Rows({ head, rows, empty, maxHeight }) {
       )
     }),
     jsx('div', {
+      key: resetKey || 'rows',
       style: { maxHeight: maxHeight || 340, overflowY: 'auto' },
       children: rows.length
         ? rows.map((cells, ri) =>
@@ -391,7 +392,18 @@ function Body({ dense, t }) {
           minWidth: dense ? 96 : 116, flex: '0 0 auto',
           whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis'
         },
-        children: isFetching ? t('Status updating') : t('Status updated', stamp)
+        // Keep the timestamp stable and signal the poll with a dot: swapping the
+        // text on every refetch made a 3 s interval read as a permanent "updating…".
+        children: jsxs('span', { style: { display: 'inline-flex', alignItems: 'center', gap: 5 }, children: [
+          jsx('span', {
+            style: {
+              width: 5, height: 5, borderRadius: 3, flex: '0 0 auto',
+              background: isFetching ? C.accent : 'transparent',
+              transition: 'background 120ms linear'
+            }
+          }),
+          jsx('span', { children: t('Status updated', stamp) })
+        ]})
       }),
       jsxs('div', {
         style: { display: 'flex', alignItems: 'center', gap: 6, marginLeft: 'auto', flex: '0 0 auto' },
@@ -528,7 +540,8 @@ function Body({ dense, t }) {
         { v: fmtCompact(s.folded), title: fmtNum(s.folded) + ' folded messages' }
       ]),
       empty: t('No sessions'),
-      maxHeight: dense ? 190 : 320
+      maxHeight: dense ? 190 : 320,
+      resetKey: range
     }),
     jsx('div', { style: { ...S.hint, display: 'flex', justifyContent: 'space-between' }, children: [
       jsx('span', { children: t('Sessions shown', shown.length, fmtNum(tot.sessions)) }),
