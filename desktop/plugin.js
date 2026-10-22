@@ -228,15 +228,23 @@ function Bar({ name, bytes, pct, accent }) {
         title: name,
         children: name
       }),
-      jsx('div', {
-        style: { height: 6, borderRadius: 3, background: C.stroke, overflow: 'hidden' },
-        children: jsx('div', {
-          style: {
-            height: '100%', borderRadius: 3,
-            width: Math.max(2, Math.min(100, pct)) + '%',
-            background: accent ? C.accent : C.faint
-          }
-        })
+      jsxs('div', {
+        style: { position: 'relative', height: 6, borderRadius: 3, background: 'transparent', overflow: 'hidden' },
+        children: [
+          jsx('div', {
+            style: {
+              position: 'absolute', inset: 0, borderRadius: 3,
+              background: C.stroke, opacity: 0.35
+            }
+          }),
+          jsx('div', {
+            style: {
+              position: 'relative', height: '100%', borderRadius: 3,
+              width: Math.max(2, Math.min(100, pct)) + '%',
+              background: accent ? C.accent : C.faint
+            }
+          })
+        ]
       }),
       jsxs('div', {
         style: {
