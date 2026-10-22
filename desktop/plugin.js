@@ -171,6 +171,14 @@ const fmtBytes = n => {
 const fmtNum = n => (n === null || n === undefined ? '—' : Number(n).toLocaleString())
 const fmtMoney = v => (v > 0 ? '$' + Number(v).toFixed(2) : '$0')
 const fmtPct = v => (v === null || v === undefined ? '—' : v.toFixed(1) + '%')
+// Table cells are narrow; a 7-digit token count does not fit at 12.5px mono.
+const fmtCompact = n => {
+  const v = Number(n) || 0
+  if (v >= 1e9) return (v / 1e9).toFixed(2) + 'B'
+  if (v >= 1e6) return (v / 1e6).toFixed(2) + 'M'
+  if (v >= 1e4) return (v / 1e3).toFixed(1) + 'K'
+  return Number.isFinite(v) ? String(Math.round(v)) : '—'
+}
 const shortModel = m => String(m || '?').split('/').pop()
 
 function Label({ children, style }) {
@@ -289,8 +297,8 @@ function Rows({ head, rows, empty, maxHeight }) {
                     ...S.num, textAlign: i >= 2 ? 'right' : 'left', color: C.body,
                     overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap'
                   },
-                  title: typeof c === 'string' ? c : undefined,
-                  children: c
+                  title: c && typeof c === 'object' ? c.title : (typeof c === 'string' ? c : undefined),
+                  children: c && typeof c === 'object' ? c.v : c
                 }, i)
               )
             }, ri)
@@ -513,7 +521,11 @@ function Body({ dense, t }) {
     jsx(Rows, {
       head: [t('Started'), t('Model'), t('Input'), t('Returned'), t('Folded')],
       rows: shown.map(s => [
-        s.started, shortModel(s.model), fmtNum(s.input), fmtNum(s.output), String(s.folded)
+        s.started,
+        { v: shortModel(s.model), title: s.model },
+        { v: fmtCompact(s.input), title: fmtNum(s.input) + ' input tokens' },
+        { v: fmtCompact(s.output), title: fmtNum(s.output) + ' output tokens' },
+        { v: fmtCompact(s.folded), title: fmtNum(s.folded) + ' folded messages' }
       ]),
       empty: t('No sessions'),
       maxHeight: dense ? 190 : 320
