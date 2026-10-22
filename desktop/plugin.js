@@ -32,6 +32,7 @@ const MESSAGES = {
     'Context economy subtitle': 'Where the context actually goes, what it costs, and how much of it never reaches the prompt.',
     'Status updated': (time) => 'updated ' + time,
     'Status updating': 'updating…',
+    'Session count': (n) => n + ' sessions',
     'Refresh interval': 'Refresh interval',
     'Period': 'Period',
     'Input tokens': 'Input tokens',
@@ -80,6 +81,7 @@ const MESSAGES = {
     'Context economy subtitle': 'Де саме йде контекст, скільки це коштує і скільки вдалося вивести з промпту.',
     'Status updated': (time) => 'оновлено ' + time,
     'Status updating': 'оновлення…',
+    'Session count': (n) => n + ' сесій',
     'Refresh interval': 'Інтервал оновлення',
     'Period': 'Період',
     'Input tokens': 'Вхідні токени',
@@ -234,7 +236,7 @@ function Bar({ name, bytes, pct, accent }) {
           jsx('div', {
             style: {
               position: 'absolute', inset: 0, borderRadius: 3,
-              background: C.stroke, opacity: 0.35
+              background: C.stroke, opacity: 0.18
             }
           }),
           jsx('div', {
@@ -603,7 +605,7 @@ function Body({ dense, t }) {
       jsx('span', {
         children: shown.length < (tot.sessions || 0)
           ? t('Sessions shown', shown.length, fmtNum(tot.sessions))
-          : fmtNum(shown.length) + ' sessions'
+          : t('Session count', fmtNum(shown.length))
       }),
       jsx('span', { children: shown.length < (tot.sessions || 0) ? t('Scroll the list') : t('All sessions') })
     ]})
