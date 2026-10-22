@@ -147,7 +147,7 @@ const S = {
     color: C.soft, lineHeight: 1.3
   },
   body: { fontSize: 13, lineHeight: 1.5, color: C.body },
-  hint: { fontSize: 11.5, lineHeight: 1.35, color: C.faint },
+  hint: { fontSize: 12, lineHeight: 1.4, color: C.soft },
   num: { fontFamily: 'ui-monospace, SFMono-Regular, Menlo, monospace', fontVariantNumeric: 'tabular-nums' },
   value: { fontSize: 21, fontWeight: 600, lineHeight: 1.15 },
   kpiPad: { padding: '14px 16px' },
@@ -253,7 +253,7 @@ function Bar({ name, bytes, pct, accent }) {
         },
         children: [
           jsx('div', { style: { color: C.soft }, children: fmtBytes(bytes) }),
-          jsx('div', { style: { color: C.faint }, children: fmtPct(pct) })
+          jsx('div', { style: { color: C.soft }, children: fmtPct(pct) })
         ]
       })
     ]
@@ -502,7 +502,7 @@ function Body({ dense, t }) {
           },
           children: [
             jsx('div', { style: { color: C.soft }, children: fmtNum(cache.local_tokens) }),
-            jsx('div', { style: { fontSize: 11, color: C.faint }, children: '$0' })
+            jsx('div', { style: { fontSize: 11.5, color: C.soft }, children: '$0' })
           ]
         })
       ]})
