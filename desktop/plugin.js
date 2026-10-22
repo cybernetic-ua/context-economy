@@ -282,12 +282,29 @@ function Spark({ days }) {
 
 const COLS = '96px minmax(0,1fr) 54px 74px 58px'
 
-function Rows({ head, rows, empty, maxHeight, resetKey }) {
+function Rows({ head, rows, empty, maxHeight, resetKey, sortCol, sortDir, onSort }) {
   return jsxs('div', { style: { ...S.card, overflow: 'hidden' }, children: [
     jsx('div', {
       style: { display: 'grid', gridTemplateColumns: COLS, gap: 10, ...S.th, alignItems: 'center' },
       children: head.map((h, i) =>
-        jsx('div', { style: { ...S.label, textAlign: i >= 2 ? 'right' : 'left' }, children: h }, i)
+        jsx('button', {
+          type: 'button',
+          onClick: onSort ? () => onSort(i) : undefined,
+          title: onSort ? 'Sort by ' + h : undefined,
+          style: {
+            ...S.label, textAlign: i >= 2 ? 'right' : 'left', background: 'transparent',
+            border: 'none', padding: 0, cursor: onSort ? 'pointer' : 'default',
+            color: sortCol === i ? C.text : C.soft,
+            display: 'flex', alignItems: 'center', gap: 4,
+            justifyContent: i >= 2 ? 'flex-end' : 'flex-start'
+          },
+          children: [
+            jsx('span', { children: h }),
+            sortCol === i
+              ? jsx('span', { style: { fontSize: 9, lineHeight: 1 }, children: sortDir < 0 ? '▼' : '▲' })
+              : null
+          ]
+        }, i)
       )
     }),
     jsx('div', {
@@ -355,6 +372,8 @@ function PriceNote({ t }) {
 
 function Body({ dense, t }) {
   const [range, setRange] = useState('7d')
+  const [sortCol, setSortCol] = useState(0)
+  const [sortDir, setSortDir] = useState(-1)
   const [refreshSec, setRefreshSec] = useState(initialRefresh)
 
   const { data, error, isFetching, dataUpdatedAt } = useQuery({
@@ -541,7 +560,23 @@ function Body({ dense, t }) {
     !sb.calls ? jsx('div', { style: { ...S.hint, marginTop: 8 }, children: t('Sandbox unused') }) : null
   ]})
 
-  const shown = sessions
+  const sortValue = (s, col) => {
+    if (col === 0) return s.ts || 0
+    if (col === 1) return shortModel(s.model).toLowerCase()
+    if (col === 2) return s.input || 0
+    if (col === 3) return s.output || 0
+    return s.folded || 0
+  }
+  const shown = sessions.slice().sort((a, b) => {
+    const x = sortValue(a, sortCol)
+    const y = sortValue(b, sortCol)
+    if (x === y) return 0
+    return (x > y ? 1 : -1) * sortDir
+  })
+  const pickSort = col => {
+    if (col === sortCol) setSortDir(d => -d)
+    else { setSortCol(col); setSortDir(col === 0 ? -1 : -1) }
+  }
   const sessionBlock = jsxs('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 }, children: [
     jsx(Rows, {
       head: [t('Started'), t('Model'), t('Input'), t('Returned'), t('Folded')],
@@ -554,7 +589,8 @@ function Body({ dense, t }) {
       ]),
       empty: t('No sessions'),
       maxHeight: dense ? 190 : 320,
-      resetKey: range + ':' + shown.length + ':' + (shown[0] ? shown[0].id : '')
+      resetKey: range + ':' + shown.length + ':' + (shown[0] ? shown[0].id : ''),
+      sortCol, sortDir, onSort: pickSort
     }),
     jsx('div', { style: { ...S.hint, display: 'flex', justifyContent: 'space-between' }, children: [
       jsx('span', {

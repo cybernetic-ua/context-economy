@@ -277,6 +277,7 @@ def session_rows(con: sqlite3.Connection, since: float, limit: int = 25) -> list
                 "folded": folded.get(sid, 0),
                 "minutes": round(dur / 60, 1),
                 "started": time.strftime("%d.%m %H:%M", time.localtime(st)),
+                "ts": float(st or 0),
             })
     except sqlite3.Error:
         return []
