@@ -378,7 +378,7 @@ function Body({ dense, t }) {
 
   const { data, error, isFetching, dataUpdatedAt } = useQuery({
     queryKey: ['context-economy', range],
-    queryFn: () => ctxRest('/stats?range=' + encodeURIComponent(range)),
+    queryFn: () => ctxRest('/stats?range=' + encodeURIComponent(range) + '&limit=200'),
     refetchInterval: refreshSec * 1000,
     refetchIntervalInBackground: true,
     placeholderData: prev => prev,

@@ -5,6 +5,7 @@ Read-only: every query runs against a mode=ro SQLite connection.
 """
 from __future__ import annotations
 
+import importlib.util
 import os
 import time
 
@@ -25,6 +26,38 @@ router = APIRouter()
 
 _CACHE: dict = {"key": None, "at": 0.0, "data": None}
 _CACHE_TTL = 2.0
+_WATCH: dict = {"mtime": None}
+
+
+def _refresh_metrics() -> None:
+    """Reload metrics.py when its file changes.
+
+    The gateway imports plugin modules once at startup, so an edited metrics.py
+    keeps serving stale code (and stale limits) until a restart. Comparing the
+    source mtime makes a plain reload of the panel enough.
+    """
+    global metrics
+    path = getattr(metrics, "__file__", None)
+    if not path or not os.path.exists(path):
+        return
+    try:
+        mtime = os.path.getmtime(path)
+    except OSError:
+        return
+    if _WATCH["mtime"] is None:
+        _WATCH["mtime"] = mtime
+        return
+    if mtime == _WATCH["mtime"]:
+        return
+    try:
+        spec = importlib.util.spec_from_file_location("context_economy_metrics", path)
+        fresh = importlib.util.module_from_spec(spec)  # type: ignore[arg-type]
+        spec.loader.exec_module(fresh)  # type: ignore[union-attr]
+        metrics = fresh
+        _WATCH["mtime"] = mtime
+        _CACHE.update(key=None, at=0.0, data=None)
+    except Exception:
+        pass
 
 
 def _hermes_home() -> str:
@@ -62,6 +95,7 @@ def _ctx_dir() -> str:
 
 @router.get("/stats")
 async def stats(range: str = metrics.DEFAULT_RANGE, limit: int = 200) -> dict:
+    _refresh_metrics()
     key = range.lower()
     cache_key = f"{key}:{limit}:{_state_db()}:{_ctx_dir()}"
     if _CACHE["data"] is not None and _CACHE["key"] == cache_key and time.time() - _CACHE["at"] < _CACHE_TTL:
