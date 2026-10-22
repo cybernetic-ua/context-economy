@@ -1,0 +1,10 @@
+name: context-economy
+version: 0.2.0
+description: "Context observability for Hermes: tool payload, prompt-cache savings, compaction folds."
+author: "Andrii Kuznietsov"
+kind: standalone
+requires_hermes: ">=0.22"
+capabilities:
+  tools: []
+  hooks: []
+  middleware: []
