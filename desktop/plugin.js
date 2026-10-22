@@ -528,7 +528,7 @@ function Body({ dense, t }) {
     !sb.calls ? jsx('div', { style: { ...S.hint, marginTop: 8 }, children: t('Sandbox unused') }) : null
   ]})
 
-  const shown = sessions.slice(0, dense ? 20 : 40)
+  const shown = sessions
   const sessionBlock = jsxs('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 }, children: [
     jsx(Rows, {
       head: [t('Started'), t('Model'), t('Input'), t('Returned'), t('Folded')],
@@ -544,7 +544,11 @@ function Body({ dense, t }) {
       resetKey: range
     }),
     jsx('div', { style: { ...S.hint, display: 'flex', justifyContent: 'space-between' }, children: [
-      jsx('span', { children: t('Sessions shown', shown.length, fmtNum(tot.sessions)) }),
+      jsx('span', {
+        children: shown.length < (tot.sessions || 0)
+          ? t('Sessions shown', shown.length, fmtNum(tot.sessions))
+          : fmtNum(shown.length) + ' sessions'
+      }),
       jsx('span', { children: shown.length < (tot.sessions || 0) ? t('Scroll the list') : t('All sessions') })
     ]})
   ]})

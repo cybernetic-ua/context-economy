@@ -61,7 +61,7 @@ def _ctx_dir() -> str:
 
 
 @router.get("/stats")
-async def stats(range: str = metrics.DEFAULT_RANGE, limit: int = 60) -> dict:
+async def stats(range: str = metrics.DEFAULT_RANGE, limit: int = 200) -> dict:
     key = range.lower()
     cache_key = f"{key}:{limit}:{_state_db()}:{_ctx_dir()}"
     if _CACHE["data"] is not None and _CACHE["key"] == cache_key and time.time() - _CACHE["at"] < _CACHE_TTL:
